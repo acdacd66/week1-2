@@ -1,8 +1,9 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
 import os
-from dotenv import load_dotenv
-from neo4j import GraphDatabase
+
+from fastapi  import FastAPI
+from pydantic import BaseModel
+from dotenv   import load_dotenv
+from neo4j    import GraphDatabase
 
 load_dotenv()
 uri=os.getenv("uri")
@@ -12,7 +13,7 @@ pwd=os.getenv("pwd")
 
 class nodemodel(BaseModel):
     name:str
-   
+
 
 def connection():
     driver=GraphDatabase.driver(uri=uri,auth=(user,pwd))
