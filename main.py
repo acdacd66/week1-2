@@ -25,8 +25,58 @@ def connection():
     driver=GraphDatabase.driver(uri=uri,auth=(user,pwd))
     return driver
 
+class musicResponse200Model(BaseModel):
+    message: str = "해당 음악이 등록되었습니다."
+class musicResponse404Model(BaseModel):
+    message: str = "이미 등록된 음악입니다."
+
+class albumResponse200Model(BaseModel):
+    message: str = "해당 앨범이 등록되었습니다."
+class abumResponse404Model(BaseModel):
+    message: str = "이미 등록된 앨범입니다."
+
+class musicianResponse200Model(BaseModel):
+    message: str = "해당 음악가는 이미 등록되었습니다."
+class musicianResponse404Model(BaseModel):
+    message: str = "이미 등록된 음악가입니다."
+
+class relationConnectedResponse200Model(BaseModel):
+    message: str ="response:relation이 등록되었습니다."
+class relationResponse404Model(BaseModel):
+    message: str ="등록되지 않은 음악입니다."
+class musicia_songResponse405Model(BaseModel):
+    message: str ="등록되지 않은  음악가입니다."
+class relationResponse406Model(BaseModel):
+    message: str ="이미 등록된 relation입니다.."
+
+class DisconnectedRelationResponse200Model(BaseModel):
+    message: str ="response:relation이 연결 해제되었습니다."
+
+
+
+
+class album_songResponse404Model(BaseModel):
+    message: str ="등록되지 않은 앨범입니다."
+
+
+class albumMusicResponse200Model(BaseModel):
+    message: str = "response:해당 앨범의 곡 목록.: "
+
+class albumMusicianResponse200Model(BaseModel):
+    message: str = "response:해당 앨범을 쓴 뮤지션 목록.: "
+
+
+
 app=FastAPI()
-@app.post("/create/music")
+@app.post("/create/music", description="곡 name을 입력으로 받고 곡을 생성하는 api입니다.", 
+responses={
+        200: {
+            "model": musicResponse200Model,
+        },
+        404: {
+            "model": musicResponse404Model,
+        },
+    },)
 def createMusicNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -51,7 +101,15 @@ def createMusicNode(node:nodeModel):
  
     return {"response":"해당 음악이 등록되었습니다. : "+data}
 
-@app.post("/create/album")
+@app.post("/create/album", description="앨범 name을 입력으로 받고 앨범을 생성하는 api입니다.",
+responses={
+        200: {
+            "model": albumResponse200Model,
+        },
+        404: {
+            "model": abumResponse404Model,
+        },
+    },)
 def createAlbumNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -75,7 +133,15 @@ def createAlbumNode(node:nodeModel):
     data=[{"Name":row["name"]}for row in results2][0]["Name"]
     return {"response":"해당 앨범이 등록되었습니다.: "+data}
 
-@app.post("/create/musician")
+@app.post("/create/musician", description="뮤지션 name을 입력으로 받고 뮤지션을 생성하는 api입니다.",
+responses={
+        200: {
+            "model": musicianResponse200Model,
+        },
+        404: {
+            "model": musicianResponse404Model,
+        },
+    },)
 def createMusicianNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -98,7 +164,24 @@ def createMusicianNode(node:nodeModel):
     data=[{"Name":row["name"]}for row in results2][0]["Name"]
     return {"response":"해당 음악가는 등록되었습니다.: "+data}
 
-@app.post("/connect/musician-song")
+@app.post("/connect/musician-song", description="뮤지션 name과 곡 name을 입력으로 받고 뮤지션 - 곡 연결하는 api입니다.",
+responses={
+        200: {
+            "model": relationConnectedResponse200Model,
+        },
+        404: {
+            "model": relationResponse404Model,
+            "description": "error1"
+        },
+            405: {
+            "model": musicia_songResponse405Model,
+            "description": "error2"
+        },
+        406: {
+            "model": relationResponse406Model,
+            "description": "error3: 이미 연결이 된 상태일때"
+        },
+    },)
 def createMusicianMusicRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -121,7 +204,7 @@ def createMusicianMusicRelationship(node:musicianSongRelationModel):
    
     exists=[{"Name":row["node_exists"]}for row in results2][0]["Name"]
     if exists == False:
-        raise HTTPException(status_code=404, detail="등록되지 않은  음악가입니다.")
+        raise HTTPException(status_code=405, detail="등록되지 않은  음악가입니다.")
     
     q3="""
     MATCH  (m:musician {name:$musician_name}),(s:music {name: $music_name}) 
@@ -131,7 +214,7 @@ def createMusicianMusicRelationship(node:musicianSongRelationModel):
     
     exists=[{"Name":row["relation_exists"]}for row in results3][0]["Name"]
     if exists == True:
-        raise HTTPException(status_code=404, detail="이미 등록된 relation입니다..")
+        raise HTTPException(status_code=406, detail="이미 등록된 relation입니다..")
     
     q4="""
    MATCH (m:musician{name:$musician_name}),(s:music{name:$music_name})
@@ -141,7 +224,24 @@ def createMusicianMusicRelationship(node:musicianSongRelationModel):
     session.run(q4,x)
     return {"response":"relation이 등록되었습니다."}
 
-@app.delete("/disconnect/musician-song")
+@app.delete("/disconnect/musician-song", description="뮤지션 name과 곡 name을 입력으로 받고 뮤지션 - 곡 연결을 해제하는 api입니다.",
+responses={
+        200: {
+            "model": DisconnectedRelationResponse200Model,
+        },
+        404: {
+            "model": relationResponse404Model,
+            "description": "error1"
+        },
+        405: {
+            "model": musicia_songResponse405Model,
+            "description": "error2"
+        },
+        406: {
+            "model": relationResponse406Model,
+            "description": "error3: 이미 연결이 된 상태일때"
+        },
+    },)
 def deleteMusicianMusicRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -164,7 +264,7 @@ def deleteMusicianMusicRelationship(node:musicianSongRelationModel):
    
     exists=[{"Name":row["node_exists"]}for row in results2][0]["Name"]
     if exists == False:
-        raise HTTPException(status_code=404, detail="등록되지 않은  음악가입니다.")
+        raise HTTPException(status_code=405, detail="등록되지 않은  음악가입니다.")
     
     q3="""
     MATCH  (m:musician {name:$musician_name}),(s:music {name: $music_name}) 
@@ -174,7 +274,7 @@ def deleteMusicianMusicRelationship(node:musicianSongRelationModel):
     
     exists=[{"Name":row["relation_exists"]}for row in results3][0]["Name"]
     if exists == False:
-        raise HTTPException(status_code=404, detail="등록이 안된 relation입니다.")
+        raise HTTPException(status_code=406, detail="등록이 안된 relation입니다.")
     
     q4="""
     MATCH (s)-[rel:sings]->(m) 
@@ -185,7 +285,24 @@ def deleteMusicianMusicRelationship(node:musicianSongRelationModel):
     session.run(q4,x)
     return {"response":"relation이 연결 해제되었습니다."}
 
-@app.post("/connect/album-song")
+@app.post("/connect/album-song", description="앨범 name과 곡 name을 입력으로 받고 곡 - 앨범 연결하는 api입니다.",
+responses={
+        200: {
+            "model": relationConnectedResponse200Model,
+        },
+        404: {
+            "model": album_songResponse404Model,
+            "description": "error1"
+        },
+        405: {
+            "model": relationResponse404Model,
+            "description": "error2"
+        },
+        406: {
+            "model": relationResponse406Model,
+            "description": "error3: 이미 연결이 된 상태일때"
+        },
+    },)
 def createAlbumMusicRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -209,7 +326,7 @@ def createAlbumMusicRelationship(node:albumSongRelationModel):
    
     exists=[{"Name":row["node_exists"]}for row in results2][0]["Name"]
     if exists == False:
-        raise HTTPException(status_code=404, detail="등록되지 않은 음악입니다.")
+        raise HTTPException(status_code=405, detail="등록되지 않은 음악입니다.")
     
     q3="""
     MATCH  (a:album {name:$album_name}),(s:music {name: $music_name}) 
@@ -219,7 +336,7 @@ def createAlbumMusicRelationship(node:albumSongRelationModel):
     
     exists=[{"Name":row["relation_exists"]}for row in results3][0]["Name"]
     if exists == True:
-        raise HTTPException(status_code=404, detail="이미 등록된 relation입니다..")
+        raise HTTPException(status_code=406, detail="이미 등록된 relation입니다.")
 
     q4="""
    match(a:album{name:$album_name}) match(s:music{name:$music_name}) where s.album_name is null set s.album_name = a.name
@@ -235,7 +352,24 @@ def createAlbumMusicRelationship(node:albumSongRelationModel):
 
 
 
-@app.delete("/disconnect/album-song")
+@app.delete("/disconnect/album-song", description="앨범 name과 곡 name을 입력으로 받고 곡 - 앨범 연결을 해제하는 api입니다.",
+responses={
+        200: {
+            "model": DisconnectedRelationResponse200Model,
+        },
+        404: {
+            "model": album_songResponse404Model,
+            "description": "error1"
+        },
+        405: {
+            "model": relationResponse404Model,
+            "description": "error2"
+        },
+        406: {
+            "model": relationResponse406Model,
+            "description": "error3: 이미 연결이 된 상태일때"
+        },
+    },)
 def deleteAlbumMusicRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -283,8 +417,18 @@ def deleteAlbumMusicRelationship(node:albumSongRelationModel):
    
     return {"response":"relation이 연결 해제되었습니다."}
 
-@app.get("/album/music")
-def readMusicNode(q:str = None):
+@app.get("/album/music", description="입력으로 엘범 name을 받고 해당 앨범의 곡 목록을 가져오는 api입니다.",
+responses={
+        200: {
+            "model": albumMusicResponse200Model,
+            "description": "만약 곡이 존재 안하면 ->'response :해당 앨범에 곡이 존재하지 않습니다. ' "
+        },
+        404: {
+            "model": album_songResponse404Model,
+            "description": "error1"
+        }
+    },)
+def readAlbumMusicNode(q:str = None):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"name":q} #get 쿼리 입력 데이터 -> 앨범 name
@@ -316,8 +460,19 @@ def readMusicNode(q:str = None):
         return {"response":"해당 앨범에 곡이 존재하지 않습니다. "} 
         
 
-@app.get("/album/musician")
-def readMusicianNode(q:str = None):
+@app.get("/album/musician", description="입력으로 엘범 name을 받고 해당 앨범을 쓴 뮤지션 목록을 가져오는 api입니다.",
+responses={
+        200: {
+            "model": albumMusicianResponse200Model,
+            "description": "만약 뮤지션이 존재 안하면 ->'response :해당 앨범을 쓴 뮤지션이 존재하지 않습니다. ' "
+        },
+        404: {
+            "model": album_songResponse404Model,
+            "description": "error1"
+        }
+    },
+)
+def readAlbumMusicianNode(q:str = None):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"name":q} #get 쿼리 입력 데이터 -> 앨범 name
