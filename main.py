@@ -27,7 +27,7 @@ def connection():
 
 app=FastAPI()
 @app.post("/create/music")
-def createNode(node:nodeModel):
+def createMusicNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"name":node.name}
@@ -52,7 +52,7 @@ def createNode(node:nodeModel):
     return {"response":"해당 음악이 등록되었습니다. : "+data}
 
 @app.post("/create/album")
-def createNode(node:nodeModel):
+def createAlbumNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"name":node.name}
@@ -76,7 +76,7 @@ def createNode(node:nodeModel):
     return {"response":"해당 앨범이 등록되었습니다.: "+data}
 
 @app.post("/create/musician")
-def createNode(node:nodeModel):
+def createMusicianNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"name":node.name}
@@ -99,7 +99,7 @@ def createNode(node:nodeModel):
     return {"response":"해당 음악가는 등록되었습니다.: "+data}
 
 @app.post("/connect/musician-song")
-def createRelationship(node:musicianSongRelationModel):
+def createMusicianMusicRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"musician_name":node.musician_name, "music_name":node.music_name}
@@ -142,7 +142,7 @@ def createRelationship(node:musicianSongRelationModel):
     return {"response":"relation이 등록되었습니다."}
 
 @app.delete("/disconnect/musician-song")
-def deleteRelationship(node:musicianSongRelationModel):
+def deleteMusicianMusicRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"musician_name":node.musician_name, "music_name":node.music_name}
@@ -186,7 +186,7 @@ def deleteRelationship(node:musicianSongRelationModel):
     return {"response":"relation이 연결 해제되었습니다."}
 
 @app.post("/connect/album-song")
-def createRelationship(node:albumSongRelationModel):
+def createAlbumMusicRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"album_name":node.album_name, "music_name":node.music_name}
@@ -236,7 +236,7 @@ def createRelationship(node:albumSongRelationModel):
 
 
 @app.delete("/disconnect/album-song")
-def deleteRelationship(node:albumSongRelationModel):
+def deleteAlbumMusicRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"album_name":node.album_name, "music_name":node.music_name}
@@ -284,10 +284,10 @@ def deleteRelationship(node:albumSongRelationModel):
     return {"response":"relation이 연결 해제되었습니다."}
 
 @app.get("/album/music")
-def readNode(q:str = None):
+def readMusicNode(q:str = None):
     driver_neo4j=connection()
     session=driver_neo4j.session()
-    x={"name":q}
+    x={"name":q} #get 쿼리 입력 데이터 -> 앨범 name
   
     q1="""
     match(a:album{name:$name}) WITH COUNT(a) > 0  as node_exists
@@ -317,10 +317,10 @@ def readNode(q:str = None):
         
 
 @app.get("/album/musician")
-def readNode(q:str = None):
+def readMusicianNode(q:str = None):
     driver_neo4j=connection()
     session=driver_neo4j.session()
-    x={"name":q}
+    x={"name":q} #get 쿼리 입력 데이터 -> 앨범 name
   
     q1=""" 
     match(a:album{name:$name}) WITH COUNT(a) > 0  as node_exists
