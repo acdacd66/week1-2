@@ -78,6 +78,8 @@ class musicianAlbumResponse200Model(BaseModel):
 class musicianMusicResponse200Model(BaseModel):
     message: str = "response:해당 뮤지션의 곡 목록.: "
 
+class relationResponse403Model(BaseModel):
+    message: str = "해당 곡은 이미 다른 앨범에 등록이 되있습니다."
 
 
 
@@ -317,6 +319,10 @@ responses={
             "model": relationResponse406Model,
             "description": "error3: 이미 연결이 된 상태일때"
         },
+         403: {
+            "model": relationResponse403Model,
+            "description": "error4: 해당 곡이 이미 다른 앨범에 등록이 되있을떄."
+        },
     },)
 def createAlbumMusicRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
@@ -357,11 +363,18 @@ def createAlbumMusicRelationship(node:albumSongRelationModel):
     match(a:album{name:$album_name}) match(s:music{name:$music_name}) where s.album_name is null set s.album_name = a.name
     """
     q5="""
-    match(a:album{name:$album_name}) match(s:music{name:$music_name}) where s.album_name = a.name merge (a) -[:has]->(s)
+     match(a:album{name:$album_name}) match(s:music{name:$music_name})  return s.album_name = a.name as matched
     """
-    
+    q6="""
+    match(a:album{name:$album_name}) match(s:music{name:$music_name}) merge (a) -[:has]->(s) 
+    """
     session.run(q4,x)
-    session.run(q5,x)
+    results4 = session.run(q5,x)
+    matchs=[{"Name":row["matched"]}for row in results4][0]["Name"]
+    if matchs == False:
+        raise HTTPException(status_code=403, detail="해당 곡은 이미 다른 앨범에 등록이 되있습니다.")
+
+    session.run(q6,x)
 
     return {"response":"relation이 등록되었습니다."}
 
