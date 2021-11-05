@@ -9,6 +9,14 @@
 - DB
   - Neo4j
 
+## 🟡 Contributors
+
+|이름   |담당 기능                 |GitHub 주소|
+|-------|-------------------------|--------------------|
+|이정우 | 모델링, 화면별 READ API, UPDATE, DELETE API  | acdacd66](https://github.com/acdacd66)    |
+|성우진 | 모델링, `곡`/`앨범`/`뮤지션` CREATE API, 배포  | [jinatra](https://github.com/jinatra)   |
+
+
 ## 🟡 구현 내용
 - 화면별 READ API
   - `곡` 페이지 
