@@ -90,6 +90,14 @@
 | GET    | /musician/album | `query` | 해당 뮤지션의 앨범 이름 호출    |
 | GET    | /musician/music | `query` | 해당 뮤지션의 곡 이름 호출    |
 
+<br>
+
+## 🟡 프로젝트 회고
+
+- 이정우:
+- 성우진: 
+
+
 
   
   
