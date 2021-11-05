@@ -26,7 +26,7 @@ def connection():
     return driver
 
 app=FastAPI()
-@app.post("/create_music")
+@app.post("/create/music")
 def createNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -51,7 +51,7 @@ def createNode(node:nodeModel):
  
     return {"response":"해당 음악이 등록되었습니다. : "+data}
 
-@app.post("/create_album")
+@app.post("/create/album")
 def createNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -75,7 +75,7 @@ def createNode(node:nodeModel):
     data=[{"Name":row["name"]}for row in results2][0]["Name"]
     return {"response":"해당 앨범이 등록되었습니다.: "+data}
 
-@app.post("/create_musician")
+@app.post("/create/musician")
 def createNode(node:nodeModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -283,8 +283,70 @@ def deleteRelationship(node:albumSongRelationModel):
    
     return {"response":"relation이 연결 해제되었습니다."}
 
-# match(n:album{name:"a1"}) match (n) -[:HAS]->(b) return b 
-# match(n:album{name:"a1"}) match (n) -[:HAS]->(b) -[:sings] -> (d) return d
+@app.get("/album/music")
+def readNode(q:str = None):
+    driver_neo4j=connection()
+    session=driver_neo4j.session()
+    x={"name":q}
+  
+    q1="""
+    match(a:album{name:$name}) WITH COUNT(a) > 0  as node_exists
+    RETURN node_exists
+    """
+    results1=session.run(q1,x)
+   
+    exists=[{"Name":row["node_exists"]}for row in results1][0]["Name"] #해당 노드가 존재하는지를 체크 -> exists:boolean: true: 존재/false:존재 안함
+    if exists == False:
+        raise HTTPException(status_code=404, detail="등록되지 않은 앨범입니다.")
+    
+       
+    q2="""
+    match(a:album{name:$name}) match (a) -[:has]->(s) return s as musics
+    """
+    results2=session.run(q2,x) # "(input album) -> (music) " 관계를 이용해서 해당 앨범의 곡 목록 추출
+    datas = [{"Name":row["musics"]}for row in results2]
+    if len(datas)>0:# 목록의 항목수가 0이 아니면
+        response = []
+        for i in range(len(datas)):
+            response.append(datas[i]["Name"]["name"])
+
+        response = list(set(response))# 목록의 값들 중복 방지
+        return {"response":"해당 앨범의 곡 목록.: "+str(response)}
+    else:
+        return {"response":"해당 앨범에 곡이 존재하지 않습니다. "} 
+        
+
+@app.get("/album/musician")
+def readNode(q:str = None):
+    driver_neo4j=connection()
+    session=driver_neo4j.session()
+    x={"name":q}
+  
+    q1=""" 
+    match(a:album{name:$name}) WITH COUNT(a) > 0  as node_exists
+    RETURN node_exists
+    """ 
+    results1=session.run(q1,x)
+   
+    exists=[{"Name":row["node_exists"]}for row in results1][0]["Name"] #해당 노드가 존재하는지를 체크 -> exists:boolean: true: 존재/false:존재 안함
+    if exists == False: 
+        raise HTTPException(status_code=404, detail="등록되지 않은 앨범입니다.")
+    
+       
+    q2="""
+    match(a:album{name:$name}) match (a) -[:has]->(s) -[:sings] -> (m) return m as musicians
+    """
+    results2=session.run(q2,x) # "(input album) -> (music) -> (musician)" 관계를 이용해서 해당 앨범을 쓴 뮤지션 목록 추출
+    datas = [{"Name":row["musicians"]}for row in results2]
+    if len(datas)>0: # 목록의 항목수가 0이 아니면
+        response = []
+        for i in range(len(datas)):
+            response.append(datas[i]["Name"]["name"])
+        response = list(set(response)) # 목록의 값들 중복 방지
+        return {"response":"해당 앨범을 쓴 뮤지션 목록.: "+str(response)}
+    else:
+        return {"response":"해당 앨범을 쓴 뮤지션이 존재하지 않습니다. "}    
+
 
 
 # MATCH (n) DETACH DELETE n
