@@ -1,12 +1,13 @@
-# 🔴 [위코드 x 원티드] 백엔드 프리온보딩 선발 과제
+# 🔴 [위코드 x 원티드] 마피아 컴퍼니 기업 협어 과제
 
 ## 🟡 구현 기술 스택
 - Language
   - Python
 - Framework
-  - Django
+  - FAST API
+  - Open API (Swagger)
 - DB
-  - sqlite3
+  - Neo4j
 
 ## 🟡 구현 내용
 - User (사용자)
