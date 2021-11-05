@@ -33,7 +33,7 @@ def createNode(node:nodeModel):
     x={"name":node.name}
     q1="""
     match(s:music{name:$name}) WITH COUNT(s) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -58,7 +58,7 @@ def createNode(node:nodeModel):
     x={"name":node.name}
     q1="""
     match(a:album{name:$name}) WITH COUNT(a) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -82,7 +82,7 @@ def createNode(node:nodeModel):
     x={"name":node.name}
     q1="""
     match(m:musician{name:$name}) WITH COUNT(m) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -98,14 +98,14 @@ RETURN node_exists
     data=[{"Name":row["name"]}for row in results2][0]["Name"]
     return {"response":"해당 음악가는 등록되었습니다.: "+data}
 
-@app.post("/musician_song")
+@app.post("/connect/musician-song")
 def createRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"musician_name":node.musician_name, "music_name":node.music_name}
     q1="""
     match(s:music{name:$music_name}) WITH COUNT(s) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -115,7 +115,7 @@ RETURN node_exists
     
     q2="""
     match(m:musician{name:$musician_name}) WITH COUNT(m) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results2=session.run(q2,x)
    
@@ -125,7 +125,7 @@ RETURN node_exists
     
     q3="""
     MATCH  (m:musician {name:$musician_name}),(s:music {name: $music_name}) 
-RETURN exists( (s)-[:sings]->(m) ) as relation_exists
+    RETURN exists( (s)-[:sings]->(m) ) as relation_exists
     """
     results3=session.run(q3,x)
     
@@ -135,20 +135,20 @@ RETURN exists( (s)-[:sings]->(m) ) as relation_exists
     
     q4="""
    MATCH (m:musician{name:$musician_name}),(s:music{name:$music_name})
-MERGE (s)-[:sings]->(m)
+    MERGE (s)-[:sings]->(m)
     """
     
     session.run(q4,x)
     return {"response":"relation이 등록되었습니다."}
 
-@app.delete("/musician_song")
+@app.delete("/disconnect/musician-song")
 def deleteRelationship(node:musicianSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
     x={"musician_name":node.musician_name, "music_name":node.music_name}
     q1="""
     match(s:music{name:$music_name}) WITH COUNT(s) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -158,7 +158,7 @@ RETURN node_exists
     
     q2="""
     match(m:musician{name:$musician_name}) WITH COUNT(m) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results2=session.run(q2,x)
    
@@ -168,7 +168,7 @@ RETURN node_exists
     
     q3="""
     MATCH  (m:musician {name:$musician_name}),(s:music {name: $music_name}) 
-RETURN exists( (s)-[:sings]->(m) ) as relation_exists
+    RETURN exists( (s)-[:sings]->(m) ) as relation_exists
     """
     results3=session.run(q3,x)
     
@@ -177,15 +177,15 @@ RETURN exists( (s)-[:sings]->(m) ) as relation_exists
         raise HTTPException(status_code=404, detail="등록이 안된 relation입니다.")
     
     q4="""
-MATCH (s)-[rel:sings]->(m) 
-WHERE s.name= $music_name  AND m.name= $musician_name 
-DELETE rel
+    MATCH (s)-[rel:sings]->(m) 
+    WHERE s.name= $music_name  AND m.name= $musician_name 
+    DELETE rel
     """
     
     session.run(q4,x)
     return {"response":"relation이 연결 해제되었습니다."}
 
-@app.post("/album_song")
+@app.post("/connect/album-song")
 def createRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -193,7 +193,7 @@ def createRelationship(node:albumSongRelationModel):
 
     q1="""
     match(a:album{name:$album_name}) WITH COUNT(a) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -203,7 +203,7 @@ RETURN node_exists
 
     q2="""
     match(s:music{name:$music_name}) WITH COUNT(s) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results2=session.run(q2,x)
    
@@ -213,7 +213,7 @@ RETURN node_exists
     
     q3="""
     MATCH  (a:album {name:$album_name}),(s:music {name: $music_name}) 
-RETURN exists( (a)-[:has]->(s) ) as relation_exists
+    RETURN exists( (a)-[:has]->(s) ) as relation_exists
     """
     results3=session.run(q3,x)
     
@@ -235,7 +235,7 @@ RETURN exists( (a)-[:has]->(s) ) as relation_exists
 
 
 
-@app.delete("/album_song")
+@app.delete("/disconnect/album-song")
 def deleteRelationship(node:albumSongRelationModel):
     driver_neo4j=connection()
     session=driver_neo4j.session()
@@ -243,7 +243,7 @@ def deleteRelationship(node:albumSongRelationModel):
 
     q1="""
     match(a:album{name:$album_name}) WITH COUNT(a) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results1=session.run(q1,x)
    
@@ -253,7 +253,7 @@ RETURN node_exists
 
     q2="""
     match(s:music{name:$music_name}) WITH COUNT(s) > 0  as node_exists
-RETURN node_exists
+    RETURN node_exists
     """
     results2=session.run(q2,x)
    
@@ -263,7 +263,7 @@ RETURN node_exists
     
     q3="""
     MATCH  (a:album {name:$album_name}),(s:music {name: $music_name}) 
-RETURN exists( (a)-[:has]->(s) ) as relation_exists
+    RETURN exists( (a)-[:has]->(s) ) as relation_exists
     """
     results3=session.run(q3,x)
     
@@ -272,10 +272,10 @@ RETURN exists( (a)-[:has]->(s) ) as relation_exists
         raise HTTPException(status_code=404, detail="등록이 안된 relation입니다.")
 
     q4="""
-MATCH (a)-[rel:has]->(s) 
-WHERE a.name= $album_name  AND s.name= $music_name 
-DELETE rel
-    """
+    MATCH (a)-[rel:has]->(s) 
+    WHERE a.name= $album_name  AND s.name= $music_name 
+    DELETE rel
+        """
   
     
     session.run(q4,x)
