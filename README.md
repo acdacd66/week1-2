@@ -45,13 +45,19 @@
 ## 🟡 ENDPOINT 
 | **METHOD** | **ENDPOINT**   | **body**   | **수행 목적** |
 |:------|:-------------|:-----------------------:|:------------|
-| POST   | /users/signup | email, password, nickname | 회원가입    |
-| POST   | /users/signin  | email, password       | 로그인        |
-| POST    | /boards/create | title, content      | 게시글 작성 |
-| GET   | /boards/list      |                   | 게시판 리스트   |
-| GET    | /boards/read/board_id>|                        | 게시글 조회 |
-| POST  | /boards/update/<board_id> | title, content | 게시글 수정     |
-| DELETE | /boards/delete/<board_id> |               | 게시글 삭제 |
+| POST   | /create_music | title, musician | 곡 생성    |
+| POST   | /create_album  | title, song, musician       | 앨범 생성        |
+| POST    | /create_musician | name      | 뮤지션 생성 |
+| GET   | /boards/list      |                   |  해당 곡이 속한 앨범 호출  |
+| GET    | /boards/read/board_id>|                        | 해당 곡을 쓴 뮤지션 호출 |
+| GET  | /boards/update/<board_id> | title, content | 해당 앨범을 쓴 뮤지션 호출     |
+| GET | /boards/delete/<board_id> |               | 해당 앨범의 곡 목록 호출 |
+| GET | /boards/delete/<board_id> |               | 해당 뮤지션의 모든 앨범 호출 |
+| GET | /boards/delete/<board_id> |               | 해당 뮤지션의 곡 목로 호출 |
+| PUT | /boards/delete/<board_id> |               | 뮤지션-곡 연결 |
+| PUT | /boards/delete/<board_id> |               | 뮤지션-곡 연결 해제 |
+| PUT | /boards/delete/<board_id> |               | 곡-앨범 연결 |
+| PUT | /boards/delete/<board_id> |               | 곡-앨범 연결 해제 |
 
 ## 🟡 API 명세
 **🟣 1. 회원가입**
