@@ -10,6 +10,8 @@
   - Open API (Swagger)
 - DB
   - Neo4j
+- 배포
+  - AWS EC2
 
 <br>
 
