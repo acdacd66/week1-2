@@ -34,7 +34,7 @@
 <br>
 
 ## 🟡 기본 설계
-<img src="https://user-images.githubusercontent.com/39540606/140586110-ad70f806-6dc2-4c3f-a586-342891527730.jpg"  width="300" height="220">
+<img src="https://user-images.githubusercontent.com/39540606/140592482-b2fdf549-5616-4f4b-a499-71df94a4cd1b.png"  width="300" height="220">
 -  이게 정석적인 그래프 db 스키마 설계인진 모르겠지만 자체적인 직감적인 설계를 하였다. <br>
 -  우선 앨범은 여러 곡을 가질수 있으나 곡은 하나의 앨범에만 속해야 하기에 1대다의 관계라고 할 수있다. 그리고 곡과 뮤지션은 일반적인 다대다 관계이고 뮤지션과 앨범은 연결되있지 않다. 앨범과 곡의 relationship을 [:has]라는 라벨로 칭하였고 뮤지션과 곡의 관계는 [:sings]이라는 라벨로 칭하였다. 
 
