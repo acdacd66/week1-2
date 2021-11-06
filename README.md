@@ -95,7 +95,7 @@
 아래 링크를 통해 본 프로젝트와 연동된 neo4j DB에 접근할 수 있습니다.
 ID와 비밀번호는 별돌 제공된 노션 페이지에서 확인 가능합니다.
 
-[ner4j DB Link](http://15.165.205.37:7474/browser/)
+[ner4j DB Link](http://54.180.159.203:7474/browser/)
 
 <br>
 
@@ -103,7 +103,7 @@ ID와 비밀번호는 별돌 제공된 노션 페이지에서 확인 가능합�
 
 아래 OPEN API 링크를 통해 엔드포인트 및 API TEST를 진행할 수 있습니다.
 
-[OPEN API Link](http://15.165.205.37/docs#/)
+[OPEN API Link](http://54.180.159.203/docs)
 
 <br>
 
