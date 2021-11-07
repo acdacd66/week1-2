@@ -560,7 +560,7 @@ def readMusicAlbumNode(q:str = None):
         raise HTTPException(status_code=404, detail="등록되지 않은 곡입니다.")
     
     q2="""
-    match(s:music{name:$name}) match (a) -[:has] -> (s) -[:sings] -> (m) return a as albums
+    match(s:music{name:$name}) match (a) -[:has] -> (s) return a as albums
     """
     results2=session.run(q2,x) # "(input music) -> (musician)" 관계를 이용해서 해당 곡이 속한 앨범 목록 추출
     datas = [{"Name":row["albums"]}for row in results2]
@@ -685,7 +685,7 @@ def readMusicianAlbumNode(q:str = None):
         raise HTTPException(status_code=404, detail="등록되지 않은 뮤지션입니다.")
     
     q2="""
-    match(m:musician{name:$name}) match (a) -[:has] -> (s) -[:sings] -> (m) return s as musics
+    match(m:musician{name:$name}) match (s) -[:sings] -> (m) return s as musics
     """
     results2=session.run(q2,x) # "(music) -> (input musician)" 관계를 이용해서 해당 뮤지션의 곡 목록 추출
     datas = [{"Name":row["musics"]}for row in results2]
